@@ -1,7 +1,8 @@
 import cv2
+import json
 import os
 
-root_data_path = 'dataset'
+data_path = 'asd'
 
 
 def main():
@@ -11,11 +12,27 @@ def main():
     face_detector = cv2.CascadeClassifier(
         'haarcascade_frontalface_default.xml')
     # For each person, enter one numeric face id
-    face_id = input('\n enter user id end press <return> ==>  ')
+    u_id = input('Enter the id for this user: ')
+    # u_id = input('\n enter user id end press <return> ==>  ')
     # Initialize individual sampling face count
+    contacts = None
+
+    with open('contacts.json', 'r') as contacts_f:
+        contacts = json.load(contacts_f)
+    if (u_id in contacts):
+        print('Updating data for user: [' + u_id + '] ' + contacts[(u_id)])
+    else:
+        name = input('Enter name for the user id: ')
+        contacts[u_id] = name
+        print('Creating data for user: [' + u_id + '] ' + contacts[u_id])
+        with open('contacts.json', 'w') as f:
+            json.dump(contacts, f)
+            print('wrote json file')
+
+    num_imgs = int(
+        input('Enter the number of pictures to take of this user: '))
     count = 0
-    u_path = root_data_path + '/User.' + face_id
-    print("\n [INFO] Initializing face capture. Look the camera and wait ...")
+    print('Please look at the camera')
 
     while (True):
         ret, img = cam.read()
@@ -25,18 +42,18 @@ def main():
         for (x, y, w, h) in faces:
             cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
             count += 1
+            print('Captured ' + str(count) + ' / ' + str(num_imgs) + ' images')
             # Save the captured image into the datasets folder
             cv2.imwrite(
-                "dataset/User." + str(face_id) + '.' + str(count) + ".jpg",
+                "dataset/User." + str(u_id) + '.' + str(count) + ".jpg",
                 gray[y:y + h, x:x + w])
             cv2.imshow('image', img)
         k = cv2.waitKey(100) & 0xff  # Press 'ESC' for exiting video
         if k == 27:
             break
-        elif count >= 20:  # Take 30 face sample and stop video
+        elif count >= num_imgs:  # Take 30 face sample and stop video
             break
     # Do a bit of cleanup
-    print("\n [INFO] Exiting Program and cleanup stuff")
     cam.release()
     cv2.destroyAllWindows()
 
