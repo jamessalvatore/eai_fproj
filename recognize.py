@@ -58,14 +58,14 @@ def main():
                 cv2.imwrite(image_file, img)
 
                 if id in approved:
-                    if (time.time() - approved[id]) > 300:
-                        send_email()
+                    if (time.time() - approved[id]) > 10:
+                        send_email(image_file,"approved")
                     else:
                         # Do we want to send an email for this?
                         approved[id] = time.time()
                 else:
                     approved[id] = time.time()
-                    send_email()
+                    send_email(image_file,"approved")
             else:
                 id = "unknown"
                 confidence = "  {0}%".format(round(100 - confidence))
@@ -76,8 +76,8 @@ def main():
                 if len(unknowns) > 99:
                     unknowns.remove(unknowns[0])
                 unknowns.append(time.time())
-                if unknowns[len(unknowns)-1] > 600:
-                    send_email()
+                if unknowns[len(unknowns)-1] > 10:
+                    send_email(image_file,"unkown")
 
             cv2.putText(img, str(id), (x + 5, y - 5), font, 1, (255, 255, 255), 2)
             cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1,
@@ -94,7 +94,7 @@ def main():
 
 
 # TODO get picture to send
-def send_email(image):
+def send_email(image, type):
     # Email I made for this project
     fromaddr = "eaifproj@gmail.com"
     # My wit email.
@@ -106,7 +106,7 @@ def send_email(image):
     msg['To'] = toaddr
     msg['Subject'] = "test"
 
-    body = "This is a test"
+    body = type
 
     msg.attach(MIMEText(body, 'plain'))
 
