@@ -1,0 +1,4 @@
+.vscode
+dataset/*
+trainer/*
+.DS_Store
