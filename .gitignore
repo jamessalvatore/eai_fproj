@@ -3,3 +3,4 @@ dataset/*
 trainer/*
 .DS_Store
 contacts.json
+.idea/*
