@@ -10,6 +10,7 @@ from email import encoders
 
 import time
 
+
 def main():
     approved = {}
     unknowns = []
@@ -87,7 +88,7 @@ def main():
 
 
 # TODO get picture to send
-def send_email():
+def send_email(image):
     # Email I made for this project
     fromaddr = "eaifproj@gmail.com"
     # My wit email.
@@ -104,8 +105,8 @@ def send_email():
     msg.attach(MIMEText(body, 'plain'))
 
     # File location + name for adding a file
-    filename = "file.txt"
-    attachment = open("/home/evan/file.txt", "rb")
+    filename = image
+    attachment = open(os.getcwd()+os.sep+image, "rb")
 
     part = MIMEBase('application', 'octet-stream')
     part.set_payload((attachment).read())
