@@ -54,6 +54,9 @@ def main():
                 id = names[id]
                 confidence = "  {0}%".format(round(100 - confidence))
 
+                image_file = 'captured.png'
+                cv2.imwrite(image_file, img)
+
                 if id in approved:
                     if (time.time() - approved[id]) > 300:
                         send_email()
@@ -66,6 +69,9 @@ def main():
             else:
                 id = "unknown"
                 confidence = "  {0}%".format(round(100 - confidence))
+
+                image_file = 'captured.png'
+                cv2.imwrite(image_file, img)
 
                 if len(unknowns) > 99:
                     unknowns.remove(unknowns[0])
