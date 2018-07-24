@@ -2,3 +2,4 @@
 dataset/*
 trainer/*
 .DS_Store
+.idea/*
