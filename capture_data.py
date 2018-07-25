@@ -17,17 +17,36 @@ def main():
     # Initialize individual sampling face count
     contacts = None
 
-    with open('contacts.json', 'r') as contacts_f:
-        contacts = json.load(contacts_f)
+    try:
+        with open('contacts.json', 'r') as contacts_f:
+            contacts = json.load(contacts_f)
+            print('contacts yo: ', contacts)
+    except FileNotFoundError as f:
+        # do nothing, just create the file later
+        pass
+    except json.JSONDecodeError as e:
+        print('Failed to parse contacts.json')
+        return
+    except Exception as e:
+        print(e)
+        return
+
+    if contacts is None:
+        contacts = {}
+
     if (u_id in contacts):
         print('Updating data for user: [' + u_id + '] ' + contacts[(u_id)])
     else:
-        name = input('Enter name for the user id: ')
+        name = input('Enter a name for this user: ')
         contacts[u_id] = name
         print('Creating data for user: [' + u_id + '] ' + contacts[u_id])
-        with open('contacts.json', 'w') as f:
-            json.dump(contacts, f)
-            print('wrote json file')
+        try:
+            with open('contacts.json', 'w') as f:
+                json.dump(contacts, f)
+                print('wrote json file')
+        except Exception as e:
+            print(e)
+            return
 
     num_imgs = int(
         input('Enter the number of pictures to take of this user: '))
