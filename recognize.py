@@ -2,13 +2,8 @@ import cv2
 import numpy as np
 import os
 
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
-
 import time
+from util import *
 
 
 def main():
@@ -59,13 +54,13 @@ def main():
 
                 if id in approved:
                     if (time.time() - approved[id]) > 10:
-                        send_email(image_file,"approved")
+                        send_email(image_file, "approved")
                     else:
                         # Do we want to send an email for this?
                         approved[id] = time.time()
                 else:
                     approved[id] = time.time()
-                    send_email(image_file,"approved")
+                    send_email(image_file, "approved")
             else:
                 id = "unknown"
                 confidence = "  {0}%".format(round(100 - confidence))
@@ -76,10 +71,11 @@ def main():
                 if len(unknowns) > 99:
                     unknowns.remove(unknowns[0])
                 unknowns.append(time.time())
-                if unknowns[len(unknowns)-1] > 10:
-                    send_email(image_file,"unkown")
+                if unknowns[len(unknowns) - 1] > 10:
+                    send_email(image_file, "unkown")
 
-            cv2.putText(img, str(id), (x + 5, y - 5), font, 1, (255, 255, 255), 2)
+            cv2.putText(img, str(id), (x + 5, y - 5), font, 1, (255, 255, 255),
+                        2)
             cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1,
                         (255, 255, 0), 1)
 
@@ -92,43 +88,6 @@ def main():
     cam.release()
     cv2.destroyAllWindows()
 
-
-# TODO get picture to send
-def send_email(image, type):
-    # Email I made for this project
-    fromaddr = "eaifproj@gmail.com"
-    # My wit email.
-    toaddr = "kowaleskie@wit.edu"
-
-    msg = MIMEMultipart()
-
-    msg['From'] = fromaddr
-    msg['To'] = toaddr
-    msg['Subject'] = "test"
-
-    body = type
-
-    msg.attach(MIMEText(body, 'plain'))
-
-    # File location + name for adding a file
-    filename = image
-    attachment = open(os.getcwd()+os.sep+image, "rb")
-
-    part = MIMEBase('application', 'octet-stream')
-    part.set_payload((attachment).read())
-    encoders.encode_base64(part)
-    part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
-
-    msg.attach(part)
-
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    # Password for email
-    server.login(fromaddr, "eaistuff")
-    text = msg.as_string()
-    server.sendmail(fromaddr, toaddr, text)
-    server.quit()
-    return True
 
 if __name__ == "__main__":
     main()

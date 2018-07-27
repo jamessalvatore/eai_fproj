@@ -1,8 +1,7 @@
 import cv2
 import json
 import os
-
-data_path = 'asd'
+from util import get_contacts
 
 
 def main():
@@ -15,24 +14,8 @@ def main():
     u_id = input('Enter the id for this user: ')
     # u_id = input('\n enter user id end press <return> ==>  ')
     # Initialize individual sampling face count
-    contacts = None
 
-    try:
-        with open('contacts.json', 'r') as contacts_f:
-            contacts = json.load(contacts_f)
-            print('contacts yo: ', contacts)
-    except FileNotFoundError as f:
-        # do nothing, just create the file later
-        pass
-    except json.JSONDecodeError as e:
-        print('Failed to parse contacts.json')
-        return
-    except Exception as e:
-        print(e)
-        return
-
-    if contacts is None:
-        contacts = {}
+    contacts = get_contacts()
 
     if (u_id in contacts):
         print('Updating data for user: [' + u_id + '] ' + contacts[(u_id)])
