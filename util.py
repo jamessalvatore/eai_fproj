@@ -1,3 +1,4 @@
+import os
 import json
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -11,9 +12,8 @@ def get_contacts():
     try:
         with open('contacts.json', 'r') as contacts_f:
             contacts = json.load(contacts_f)
-    except FileNotFoundError as f:
-        # do nothing, just create the file later
-        pass
+    except FileNotFoundError as e:
+        raise e
     except json.JSONDecodeError as e:
         raise e
     except Exception as e:

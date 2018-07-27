@@ -15,7 +15,11 @@ def main():
     # u_id = input('\n enter user id end press <return> ==>  ')
     # Initialize individual sampling face count
 
-    contacts = get_contacts()
+    try:
+        contacts = get_contacts()
+    except FileNotFoundError as e:
+        # ignore, just create the file at the end
+        pass
 
     if (u_id in contacts):
         print('Updating data for user: [' + u_id + '] ' + contacts[(u_id)])
