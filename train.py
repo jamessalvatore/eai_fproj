@@ -7,6 +7,11 @@ path = 'dataset'
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 
+if os.path.exists('./trainer/trainer.yml'):
+    input("The model file already exists, press enter to proceed this will override the current model")
+
+elif os.path.isdir('trainer') == False:
+    os.mkdir("trainer")
 
 # function to get the images and label data
 def getImagesAndLabels(path):

@@ -24,8 +24,8 @@ def main():
     id = 0
     # names related to ids: example ==> Marcelo: id=1,  etc
     # names = ['None', 'Marcelo', 'Paula', 'Ilza', 'Z', 'W']
-    names = ['James']
-    # Initialize and start realtime video capture
+    with open('contacts.json', 'r') as contacts_f:
+        names = json.load(contacts_f)    # Initialize and start realtime video capture
     cam = cv2.VideoCapture(0)
     cam.set(3, 640)  # set video widht
     cam.set(4, 480)  # set video height
