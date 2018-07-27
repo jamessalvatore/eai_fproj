@@ -53,6 +53,10 @@ def main():
     count = 0
     print('Please look at the camera')
 
+    #if dir dataset does not exist, make it
+    if not os.path.exists("dataset"):
+        os.mkdir("dataset")
+
     while (True):
         ret, img = cam.read()
 
