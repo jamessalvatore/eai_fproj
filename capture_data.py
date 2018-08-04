@@ -15,6 +15,8 @@ def main():
     # u_id = input('\n enter user id end press <return> ==>  ')
     # Initialize individual sampling face count
 
+    contacts = {}
+
     try:
         contacts = get_contacts()
     except FileNotFoundError as e:
