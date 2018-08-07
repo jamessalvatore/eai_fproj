@@ -2,6 +2,10 @@ import cv2
 import numpy as np
 import os
 
+from picamera.array import PiRGBArray
+from picamera import PiCamera
+
+
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -26,7 +30,7 @@ def main():
     # names = ['None', 'Marcelo', 'Paula', 'Ilza', 'Z', 'W']
     names = ['James']
     # Initialize and start realtime video capture
-    cam = cv2.VideoCapture(0)
+    cam = cv2.VideoCapture("/dev/video0")
     cam.set(3, 640)  # set video widht
     cam.set(4, 480)  # set video height
     # Define min window size to be recognized as a face
