@@ -5,14 +5,8 @@ import os
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 
-
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
-
 import time
+from util import *
 
 
 def main():
@@ -38,12 +32,17 @@ def main():
 
     time.sleep(.1)
 
-    #cam = cv2.VideoCapture("/dev/video0")
-    #cam.set(3, 640)  # set video widht
-    #cam.set(4, 480)  # set video height
-    # Define min window size to be recognized as a face
-    minW = 0.1 * 640 #cam.get(3)
-    minH = 0.1 * 480 #cam.get(4)
+    names = get_contacts()
+    if names == {}:
+        print('No contact names found in your contacts file. Exiting...')
+        return
+
+    cam = cv2.VideoCapture(0)
+    cam.set(3, 640)
+    cam.set(4, 480)
+
+    minW = 0.1 * cam.get(3)
+    minH = 0.1 * cam.get(4)
     user_times = {}
 
 
@@ -63,9 +62,8 @@ def main():
         for (x, y, w, h) in faces:
             cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
             id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
-            print('id: ', id)
-            print('conf: ', confidence)
-            # Check if confidence is less them 100 ==> "0" is perfect match
+            # confidence here is the distance to the closest item (calculated using chi-square distance) in the dataset that matches
+            # this id. 0 is a perfect match.
             if (confidence < 100):
                 id = names[id]
                 confidence = "  {0}%".format(round(100 - confidence))
@@ -75,13 +73,13 @@ def main():
 
                 if id in approved:
                     if (time.time() - approved[id]) > 10:
-                        send_email(image_file,"approved")
+                        send_email(image_file, "approved")
                     else:
                         # Do we want to send an email for this?
                         approved[id] = time.time()
                 else:
                     approved[id] = time.time()
-                    send_email(image_file,"approved")
+                    send_email(image_file, "approved")
             else:
                 id = "unknown"
                 confidence = "  {0}%".format(round(100 - confidence))
@@ -92,12 +90,14 @@ def main():
                 if len(unknowns) > 99:
                     unknowns.remove(unknowns[0])
                 unknowns.append(time.time())
-                if unknowns[len(unknowns)-1] > 10:
-                    send_email(image_file,"unkown")
+                if unknowns[len(unknowns) - 1] > 10:
+                    send_email(image_file, "unkown")
 
-            cv2.putText(img, str(id), (x + 5, y - 5), font, 1, (255, 255, 255), 2)
-            cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1,
-                        (255, 255, 0), 1)
+            cv2.putText(img, str(id), (x + 5, y - 5), font, 1, (255, 255, 255),
+                        2)
+            # dont show the confidence if it's unknown (not relevant)
+            # cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1,
+            #             (255, 255, 0), 1)
 
         #cv2.imshow('camera', img)
         k = cv2.waitKey(10) & 0xff  # Press 'ESC' for exiting video
@@ -111,43 +111,6 @@ def main():
     cam.release()
     cv2.destroyAllWindows()
 
-
-# TODO get picture to send
-def send_email(image, type):
-    # Email I made for this project
-    fromaddr = "eaifproj@gmail.com"
-    # My wit email.
-    toaddr = "kowaleskie@wit.edu"
-
-    msg = MIMEMultipart()
-
-    msg['From'] = fromaddr
-    msg['To'] = toaddr
-    msg['Subject'] = "test"
-
-    body = type
-
-    msg.attach(MIMEText(body, 'plain'))
-
-    # File location + name for adding a file
-    filename = image
-    attachment = open(os.getcwd()+os.sep+image, "rb")
-
-    part = MIMEBase('application', 'octet-stream')
-    part.set_payload((attachment).read())
-    encoders.encode_base64(part)
-    part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
-
-    msg.attach(part)
-
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    # Password for email
-    server.login(fromaddr, "eaistuff")
-    text = msg.as_string()
-    server.sendmail(fromaddr, toaddr, text)
-    server.quit()
-    return True
 
 if __name__ == "__main__":
     main()

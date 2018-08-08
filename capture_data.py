@@ -5,7 +5,7 @@ import time
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 
-data_path = 'asd'
+from util import get_contacts
 
 
 def main():
@@ -26,24 +26,14 @@ def main():
     u_id = input('Enter the id for this user: ')
     # u_id = input('\n enter user id end press <return> ==>  ')
     # Initialize individual sampling face count
-    contacts = None
+
+    contacts = {}
 
     try:
-        with open('contacts.json', 'r') as contacts_f:
-            contacts = json.load(contacts_f)
-            print('contacts yo: ', contacts)
-    except FileNotFoundError as f:
-        # do nothing, just create the file later
+        contacts = get_contacts()
+    except FileNotFoundError as e:
+        # ignore, just create the file at the end
         pass
-    except json.JSONDecodeError as e:
-        print('Failed to parse contacts.json')
-        return
-    except Exception as e:
-        print(e)
-        return
-
-    if contacts is None:
-        contacts = {}
 
     if (u_id in contacts):
         print('Updating data for user: [' + u_id + '] ' + contacts[(u_id)])
@@ -64,15 +54,8 @@ def main():
     count = 0
     print('Please look at the camera')
 
-    t = 0
-
-
-
-
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     #while (True):
-        t += 1
-        print(t)
         #time.sleep(.1)
 #        ret, img = cam.read()
         #camera.capture(rawCapture, format="bgr")
