@@ -9,9 +9,9 @@ from util import get_contacts
 
 
 def main():
-#    cam = cv2.VideoCapture("/dev/video0")
-#    cam.set(3, 640)  # set video width
-#    cam.set(4, 480)  # set video height
+    #    cam = cv2.VideoCapture("/dev/video0")
+    #    cam.set(3, 640)  # set video width
+    #    cam.set(4, 480)  # set video height
 
     camera = PiCamera()
     camera.resolution = (640, 480)
@@ -27,13 +27,7 @@ def main():
     # u_id = input('\n enter user id end press <return> ==>  ')
     # Initialize individual sampling face count
 
-    contacts = {}
-
-    try:
-        contacts = get_contacts()
-    except FileNotFoundError as e:
-        # ignore, just create the file at the end
-        pass
+    contacts = get_contacts()
 
     if (u_id in contacts):
         print('Updating data for user: [' + u_id + '] ' + contacts[(u_id)])
@@ -54,18 +48,19 @@ def main():
     count = 0
     print('Please look at the camera')
 
-    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    #while (True):
+    for frame in camera.capture_continuous(
+            rawCapture, format="bgr", use_video_port=True):
+        #while (True):
         #time.sleep(.1)
-#        ret, img = cam.read()
+        #        ret, img = cam.read()
         #camera.capture(rawCapture, format="bgr")
         img = frame.array
 
-#        img = cv2.imread(img,0)
-        
-#        print(ret)
+        #        img = cv2.imread(img,0)
+
+        #        print(ret)
         #if not ret:
-            #continue
+        #continue
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = face_detector.detectMultiScale(gray, 1.3, 5)
         for (x, y, w, h) in faces:
@@ -84,12 +79,13 @@ def main():
             print("more")
             break
 
-        rawCapture.truncate(0) 
+        rawCapture.truncate(0)
 
     # Do a bit of cleanup
+
+
 #    cam.release()
     cv2.destroyAllWindows()
-
 
 if __name__ == "__main__":
     main()

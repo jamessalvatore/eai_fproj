@@ -22,7 +22,7 @@ def main():
     id = 0
     # names related to ids: example ==> Marcelo: id=1,  etc
     # names = ['None', 'Marcelo', 'Paula', 'Ilza', 'Z', 'W']
-    names = ['James']
+    names = get_contacts()
     # Initialize and start realtime video capture
 
     cam = PiCamera()
@@ -45,9 +45,9 @@ def main():
     minH = 0.1 * cam.get(4)
     user_times = {}
 
-
     #while True:
-    for frame in cam.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+    for frame in cam.capture_continuous(
+            rawCapture, format="bgr", use_video_port=True):
         #ret, img = cam.read()
         # img = cv2.flip(img, -1)  # Flip vertically
         img = frame.array
@@ -103,9 +103,8 @@ def main():
         k = cv2.waitKey(10) & 0xff  # Press 'ESC' for exiting video
         if k == 27:
             break
-        
 
-        rawCapture.truncate(0) 
+        rawCapture.truncate(0)
     # Do a bit of cleanup
     print("\n [INFO] Exiting Program and cleanup stuff")
     cam.release()
