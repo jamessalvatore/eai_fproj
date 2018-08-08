@@ -1,13 +1,25 @@
 import cv2
 import json
 import os
+import time
+from picamera.array import PiRGBArray
+from picamera import PiCamera
+
 from util import get_contacts
 
 
 def main():
-    cam = cv2.VideoCapture(0)
-    cam.set(3, 640)  # set video width
-    cam.set(4, 480)  # set video height
+#    cam = cv2.VideoCapture("/dev/video0")
+#    cam.set(3, 640)  # set video width
+#    cam.set(4, 480)  # set video height
+
+    camera = PiCamera()
+    camera.resolution = (640, 480)
+    camera.framerate = 32
+    rawCapture = PiRGBArray(camera, size=(640, 480))
+
+    time.sleep(.1)
+
     face_detector = cv2.CascadeClassifier(
         'haarcascade_frontalface_default.xml')
     # For each person, enter one numeric face id
@@ -42,13 +54,18 @@ def main():
     count = 0
     print('Please look at the camera')
 
-    #if dir dataset does not exist, make it
-    if not os.path.exists("dataset"):
-        os.mkdir("dataset")
+    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+    #while (True):
+        #time.sleep(.1)
+#        ret, img = cam.read()
+        #camera.capture(rawCapture, format="bgr")
+        img = frame.array
 
-    while (True):
-        ret, img = cam.read()
-
+#        img = cv2.imread(img,0)
+        
+#        print(ret)
+        #if not ret:
+            #continue
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = face_detector.detectMultiScale(gray, 1.3, 5)
         for (x, y, w, h) in faces:
@@ -59,14 +76,18 @@ def main():
             cv2.imwrite(
                 "dataset/User." + str(u_id) + '.' + str(count) + ".jpg",
                 gray[y:y + h, x:x + w])
-            cv2.imshow('image', img)
+            #cv2.imshow('image', img)
         k = cv2.waitKey(100) & 0xff  # Press 'ESC' for exiting video
         if k == 27:
             break
         elif count >= num_imgs:  # Take 30 face sample and stop video
+            print("more")
             break
+
+        rawCapture.truncate(0) 
+
     # Do a bit of cleanup
-    cam.release()
+#    cam.release()
     cv2.destroyAllWindows()
 
 
