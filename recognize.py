@@ -30,16 +30,28 @@ def main():
     # names = ['None', 'Marcelo', 'Paula', 'Ilza', 'Z', 'W']
     names = ['James']
     # Initialize and start realtime video capture
-    cam = cv2.VideoCapture("/dev/video0")
-    cam.set(3, 640)  # set video widht
-    cam.set(4, 480)  # set video height
+
+    cam = PiCamera()
+    cam.resolution = (640, 480)
+    cam.framerate = 32
+    rawCapture = PiRGBArray(cam, size=(640, 480))
+
+    time.sleep(.1)
+
+    #cam = cv2.VideoCapture("/dev/video0")
+    #cam.set(3, 640)  # set video widht
+    #cam.set(4, 480)  # set video height
     # Define min window size to be recognized as a face
-    minW = 0.1 * cam.get(3)
-    minH = 0.1 * cam.get(4)
+    minW = 0.1 * 640 #cam.get(3)
+    minH = 0.1 * 480 #cam.get(4)
     user_times = {}
-    while True:
-        ret, img = cam.read()
+
+
+    #while True:
+    for frame in cam.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+        #ret, img = cam.read()
         # img = cv2.flip(img, -1)  # Flip vertically
+        img = frame.array
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         faces = faceCascade.detectMultiScale(
@@ -87,10 +99,13 @@ def main():
             cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1,
                         (255, 255, 0), 1)
 
-        cv2.imshow('camera', img)
+        #cv2.imshow('camera', img)
         k = cv2.waitKey(10) & 0xff  # Press 'ESC' for exiting video
         if k == 27:
             break
+        
+
+        rawCapture.truncate(0) 
     # Do a bit of cleanup
     print("\n [INFO] Exiting Program and cleanup stuff")
     cam.release()
